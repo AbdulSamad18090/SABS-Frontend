@@ -1,4 +1,4 @@
-import { Activity, Star, HelpCircle, DollarSign, Mail } from "lucide-react";
+import { Activity, Star, HelpCircle, DollarSign, Mail, Gift } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ModeToggle } from "../mode-toggle/mode-toggle";
@@ -34,35 +34,35 @@ const Header = () => {
     <>
       {/* Desktop Header - Top */}
       <header className="hidden md:flex px-4 lg:px-6 h-16 items-center border-b bg-transparent/95 backdrop-blur supports-[backdrop-filter]:bg-transparent/60 sticky top-0 z-50">
-        <Link className="flex items-center justify-center" to="#">
+        <Link className="flex items-center justify-center" to="/#">
           <Activity className="h-8 w-8 text-primary" />
           <span className="ml-2 text-xl font-bold">SmartDoc</span>
         </Link>
         <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <Link
+          <a
             className="text-sm font-medium hover:text-primary transition-colors"
-            to="#features"
+            href="/#features"
           >
             Features
-          </Link>
-          <Link
+          </a>
+          <a
             className="text-sm font-medium hover:text-primary transition-colors"
-            to="#how-it-works"
+            href="/#how-it-works"
           >
             How It Works
-          </Link>
-          <Link
+          </a>
+          <a
             className="text-sm font-medium hover:text-primary transition-colors"
-            to="#pricing"
+            href="/#benifits"
           >
-            Pricing
-          </Link>
-          <Link
+            Benifits
+          </a>
+          <a
             className="text-sm font-medium hover:text-primary transition-colors"
-            to="#contact"
+            href="/#contact"
           >
             Contact
-          </Link>
+          </a>
           <ModeToggle />
         </nav>
       </header>
@@ -76,42 +76,42 @@ const Header = () => {
         <div className="px-4 py-3">
           {/* Navigation Links with Icons */}
           <div className="grid grid-cols-5 gap-0">
-            <Link
+            <a
               className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              to="#features"
+              href="/#features"
             >
               <Star className="h-5 w-5" />
               <span className="text-xs text-center line-clamp-1">Features</span>
-            </Link>
-            <Link
+            </a>
+            <a
               className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              to="#how-it-works"
+              href="/#how-it-works"
             >
               <HelpCircle className="h-5 w-5" />
               <span className="text-xs text-center line-clamp-1">
                 How it Works
               </span>
-            </Link>
+            </a>
 
             {/* Mode Toggle in Center */}
             <div className="flex flex-col items-center gap-1 py-2">
               <ModeToggle align="center" />
             </div>
 
-            <Link
+            <a
               className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              to="#pricing"
+              href="/#benifits"
             >
-              <DollarSign className="h-5 w-5" />
-              <span className="text-xs text-center line-clamp-1">Pricing</span>
-            </Link>
-            <Link
+              <Gift className="h-5 w-5" />
+              <span className="text-xs text-center line-clamp-1">Benifits</span>
+            </a>
+            <a
               className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              to="#contact"
+              href="/#contact"
             >
               <Mail className="h-5 w-5" />
               <span className="text-xs text-center line-clamp-1">Contact</span>
-            </Link>
+            </a>
           </div>
         </div>
       </nav>

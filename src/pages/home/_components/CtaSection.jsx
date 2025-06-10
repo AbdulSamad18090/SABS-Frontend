@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const CtaSection = () => {
   return (
-    <section className="w-full py-10 bg-primary">
+    <section id="contact" className="w-full py-10 bg-primary">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
@@ -42,10 +42,10 @@ const CtaSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button size="lg" variant="secondary">
               <PhoneCall className="mr-2 h-4 w-4" />
-              Schedule Demo Call
+              Continue as Doctor
             </Button>
             <Button size="lg" variant="outline">
-              View Pricing Plans
+              Continue as Patient
             </Button>
           </div>
         </div>

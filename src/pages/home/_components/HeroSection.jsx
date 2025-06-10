@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, PhoneCall, Zap } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -30,14 +31,18 @@ const HeroSection = () => {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Register as a Doctor
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="lg">
-                <PhoneCall className="mr-2 h-4 w-4" />
-                Schedule Appointment
-              </Button>
+              <Link to="/auth?role=doctor">
+                <Button size="lg" className="bg-primary hover:bg-primary/90">
+                  Register as a Doctor
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/auth?role=patient">
+                <Button variant="outline" size="lg">
+                  <PhoneCall className="mr-2 h-4 w-4" />
+                  Schedule Appointment
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
