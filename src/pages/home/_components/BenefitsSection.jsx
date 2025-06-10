@@ -4,7 +4,7 @@ import React from "react";
 
 const BenefitsSection = () => {
   return (
-    <section id="benifits" className="w-full py-10">
+    <section id="benefits" className="w-full py-10">
       <div className="container px-4 md:px-6">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4">

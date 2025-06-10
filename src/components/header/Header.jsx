@@ -1,11 +1,55 @@
-import { Activity, Star, HelpCircle, DollarSign, Mail, Gift } from "lucide-react";
+import {
+  Activity,
+  Star,
+  HelpCircle,
+  DollarSign,
+  Mail,
+  Gift,
+  ArrowRight,
+  Users,
+  Menu,
+  X,
+  User,
+  LogOut,
+} from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ModeToggle } from "../mode-toggle/mode-toggle";
+import { Button } from "../ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isLogined, setIsLogined] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        setIsLogined(true);
+        setUserRole(parsedUser.role);
+      } catch (error) {
+        console.log(error);
+        setIsLogined(false);
+        setUserRole(null);
+      }
+    } else {
+      setIsLogined(false);
+      setUserRole(null);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -30,6 +74,54 @@ const Header = () => {
     }
   }, [lastScrollY]);
 
+  // Default navigation items for non-logged-in users
+  const defaultNavItems = [
+    { label: "Features", href: "/#features", icon: Star },
+    { label: "How It Works", href: "/#how-it-works", icon: HelpCircle },
+    { label: "Benefits", href: "/#benefits", icon: Gift },
+    { label: "Contact", href: "/#contact", icon: Mail },
+  ];
+
+  // Patient-specific navigation items
+  const patientNavItems = [
+    { label: "View Doctors", href: "/doctors", icon: Users },
+    { label: "Manage Profile", href: "/profile", icon: User },
+  ];
+
+  // Doctor-specific navigation items
+  const doctorNavItems = [
+    { label: "Manage Profile", href: "/profile", icon: User },
+  ];
+
+  // Determine which navigation items to show
+  const getNavItems = () => {
+    if (!isLogined) {
+      return defaultNavItems;
+    }
+    if (userRole === "doctor") {
+      return doctorNavItems;
+    }
+    if (userRole === "patient") {
+      return patientNavItems;
+    }
+    return defaultNavItems; // Fallback
+  };
+
+  const navItems = getNavItems();
+
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setIsLogined(false);
+    setUserRole(null);
+    setIsSheetOpen(false);
+    // Optionally redirect to home page
+    window.location.href = "/";
+  };
+
   return (
     <>
       {/* Desktop Header - Top */}
@@ -39,82 +131,156 @@ const Header = () => {
           <span className="ml-2 text-xl font-bold">SmartDoc</span>
         </Link>
         <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <a
-            className="text-sm font-medium hover:text-primary transition-colors"
-            href="/#features"
-          >
-            Features
-          </a>
-          <a
-            className="text-sm font-medium hover:text-primary transition-colors"
-            href="/#how-it-works"
-          >
-            How It Works
-          </a>
-          <a
-            className="text-sm font-medium hover:text-primary transition-colors"
-            href="/#benifits"
-          >
-            Benifits
-          </a>
-          <a
-            className="text-sm font-medium hover:text-primary transition-colors"
-            href="/#contact"
-          >
-            Contact
-          </a>
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              className="text-sm font-medium hover:text-primary transition-colors"
+              href={item.href}
+            >
+              {item.label}
+            </a>
+          ))}
+
           <ModeToggle />
+          {isLogined ? (
+            <Link to={"/dashboard"}>
+              <Button>
+                <Activity />
+                Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link to={"/auth"}>
+              <Button>
+                Get Started
+                <ArrowRight />
+              </Button>
+            </Link>
+          )}
         </nav>
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      <nav
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t transition-transform duration-300 ${
-          isVisible ? "translate-y-0" : "translate-y-full"
+      {/* Mobile Header */}
+      <header
+        className={`md:hidden flex px-4 h-16 items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50 transition-transform duration-300 ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="px-4 py-3">
-          {/* Navigation Links with Icons */}
-          <div className="grid grid-cols-5 gap-0">
-            <a
-              className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              href="/#features"
-            >
-              <Star className="h-5 w-5" />
-              <span className="text-xs text-center line-clamp-1">Features</span>
-            </a>
-            <a
-              className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              href="/#how-it-works"
-            >
-              <HelpCircle className="h-5 w-5" />
-              <span className="text-xs text-center line-clamp-1">
-                How it Works
-              </span>
-            </a>
+        <Link className="flex items-center justify-center" to="/#">
+          <Activity className="h-8 w-8 text-primary" />
+          <span className="ml-2 text-xl font-bold">SmartDoc</span>
+        </Link>
 
-            {/* Mode Toggle in Center */}
-            <div className="flex flex-col items-center gap-1 py-2">
-              <ModeToggle align="center" />
-            </div>
+        <div className="ml-auto flex items-center gap-2">
+          <ModeToggle />
 
-            <a
-              className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              href="/#benifits"
-            >
-              <Gift className="h-5 w-5" />
-              <span className="text-xs text-center line-clamp-1">Benifits</span>
-            </a>
-            <a
-              className="flex flex-col items-center gap-1 hover:text-primary transition-colors py-2"
-              href="/#contact"
-            >
-              <Mail className="h-5 w-5" />
-              <span className="text-xs text-center line-clamp-1">Contact</span>
-            </a>
-          </div>
+          {/* Mobile Menu Sheet */}
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <Activity className="h-6 w-6 text-primary" />
+                  SmartDoc Menu
+                </SheetTitle>
+                <SheetDescription>
+                  {isLogined
+                    ? `Welcome back! You're logged in as a ${userRole}.`
+                    : "Navigate through SmartDoc features and services."}
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="space-y-4 px-4">
+                {/* Navigation Items */}
+                {navItems.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                      Navigation
+                    </h3>
+                    {navItems.map((item) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          onClick={handleLinkClick}
+                          className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                          <IconComponent className="h-5 w-5" />
+                          {item.label}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* User Info */}
+                {isLogined && (
+                  <div className="space-y-2 pt-4 border-t">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                      Account
+                    </h3>
+                    <div className="px-3 py-2 bg-accent/50 rounded-md">
+                      <p className="text-sm">
+                        <span className="font-medium"></span>{" "}
+                        <span className="capitalize text-primary">
+                          {userRole}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="space-y-2 pt-4 border-t">
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    Actions
+                  </h3>
+                  {isLogined ? (
+                    <Link to="/dashboard" onClick={handleLinkClick}>
+                      <Button
+                        className="w-full justify-start"
+                        variant="default"
+                      >
+                        <Activity className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link to="/auth" onClick={handleLinkClick}>
+                      <Button
+                        className="w-full justify-start"
+                        variant="default"
+                      >
+                        Get Started
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </Link>
+                  )}
+                  {/* Logout Button */}
+                  {isLogined && (
+                    <div className="pt-4 border-t mt-auto">
+                      <Button
+                        onClick={handleLogout}
+                        variant="outline"
+                        className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      </nav>
+      </header>
     </>
   );
 };
