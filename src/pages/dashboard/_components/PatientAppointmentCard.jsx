@@ -33,13 +33,13 @@ const PatientAppointmentCard = ({ appointment, showActions = true }) => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-foreground">
                 {appointment.doctor_name}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {appointment.specialization}
               </p>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+              <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   {appointment.date}
@@ -48,12 +48,12 @@ const PatientAppointmentCard = ({ appointment, showActions = true }) => {
                   <Clock className="h-4 w-4" />
                   {appointment.time}
                 </div>
-                <span className="text-gray-400">•</span>
+                <span className="text-muted-foreground">•</span>
                 <span>{appointment.type}</span>
               </div>
               <div className="flex items-center gap-1 mt-1">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
                   {appointment.clinic}
                 </span>
               </div>

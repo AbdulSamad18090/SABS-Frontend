@@ -196,21 +196,21 @@ const PatientDashboard = () => {
               <AvatarFallback>{getInitials(doctor.name)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{doctor.name}</h3>
-              <p className="text-sm text-gray-600">{doctor.specialization}</p>
+              <h3 className="font-semibold text-foreground">{doctor.name}</h3>
+              <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex items-center">
                   {renderStars(Math.floor(doctor.rating))}
-                  <span className="ml-1 text-sm text-gray-600">
+                  <span className="ml-1 text-sm text-muted-foreground">
                     ({doctor.rating})
                   </span>
                 </div>
                 <span className="text-gray-400">•</span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   {doctor.experience}
                 </span>
               </div>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+              <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
                   {doctor.clinic}
@@ -223,7 +223,7 @@ const PatientDashboard = () => {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-lg font-semibold text-gray-900">{doctor.fee}</p>
+            <p className="text-lg font-semibold text-foreground">{doctor.fee}</p>
             <Button size="sm" className="mt-2">
               Book Now
             </Button>
@@ -250,9 +250,9 @@ const PatientDashboard = () => {
               )}
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{record.title}</h3>
-              <p className="text-sm text-gray-600">{record.type}</p>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+              <h3 className="font-semibold text-foreground">{record.title}</h3>
+              <p className="text-sm text-muted-foreground">{record.type}</p>
+              <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                 <span>{record.date}</span>
                 <span className="text-gray-400">•</span>
                 <span>{record.doctor}</span>
@@ -279,19 +279,19 @@ const PatientDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-background shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 Patient Dashboard
               </h1>
             </div>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="Search doctors..."
@@ -322,7 +322,7 @@ const PatientDashboard = () => {
                     </Avatar>
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{patientData.full_name}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-muted-foreground">
                         {patientData.email}
                       </p>
                     </div>
@@ -457,7 +457,7 @@ const PatientDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="cursor-pointer hover:shadow-md transition-shadow">
                 <CardContent className="p-6 text-center">
-                  <Stethoscope className="h-8 w-8 mx-auto mb-4 text-blue-600" />
+                  <Stethoscope className="h-8 w-8 mx-auto mb-4 text-primary" />
                   <CardTitle className="text-lg mb-2">Find Doctors</CardTitle>
                   <CardDescription>
                     Search and book appointments with specialists
@@ -503,7 +503,7 @@ const PatientDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Upcoming</h3>
+                  <h3 className="font-semibold text-foreground">Upcoming</h3>
                   {upcomingAppointments.map((appointment) => (
                     <PatientAppointmentCard
                       key={appointment.id}
@@ -512,7 +512,7 @@ const PatientDashboard = () => {
                   ))}
                 </div>
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-foreground">
                     Past Appointments
                   </h3>
                   {pastAppointments.map((appointment) => (
@@ -587,7 +587,7 @@ const PatientDashboard = () => {
                       <h3 className="text-xl font-semibold">
                         {patientData.full_name}
                       </h3>
-                      <p className="text-gray-600">{patientData.email}</p>
+                      <p className="text-muted-foreground">{patientData.email}</p>
                       <Button variant="outline" size="sm" className="mt-2">
                         Change Photo
                       </Button>
@@ -595,43 +595,43 @@ const PatientDashboard = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-muted-foreground">
                         Age
                       </label>
-                      <p className="text-gray-900">
+                      <p className="text-foreground">
                         {patientData.patientProfile.age} years
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-muted-foreground">
                         Blood Group
                       </label>
-                      <p className="text-gray-900">
+                      <p className="text-foreground">
                         {patientData.patientProfile.blood_group}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-muted-foreground">
                         Phone
                       </label>
-                      <p className="text-gray-900">
+                      <p className="text-foreground">
                         {patientData.patientProfile.phone}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-muted-foreground">
                         Emergency Contact
                       </label>
-                      <p className="text-gray-900">
+                      <p className="text-foreground">
                         {patientData.patientProfile.emergency_contact}
                       </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-muted-foreground">
                       Address
                     </label>
-                    <p className="text-gray-900">
+                    <p className="text-foreground">
                       {patientData.patientProfile.address}
                     </p>
                   </div>
@@ -647,7 +647,7 @@ const PatientDashboard = () => {
                   <div className="text-center py-4">
                     <Heart className="h-12 w-12 mx-auto text-red-500 mb-4" />
                     <h3 className="font-semibold">Health Dashboard</h3>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="text-sm text-muted-foreground mt-2">
                       Track your vitals, medications, and health goals
                     </p>
                     <Button variant="outline" size="sm" className="mt-4">
