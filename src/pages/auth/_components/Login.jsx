@@ -43,7 +43,6 @@ const Login = () => {
           password: formData.password,
         }
       );
-      console.log(response)
       if (response.data.success) {
         toast.success(response?.data?.message);
         localStorage.setItem("accessToken", response.data.data.accessToken);
@@ -52,7 +51,6 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (error) {
-      console.log(error)
       toast.error(
         error?.response?.data?.error || error?.response?.data?.details[0]
       );

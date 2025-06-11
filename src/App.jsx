@@ -5,6 +5,7 @@ import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Auth from "./pages/auth/Auth";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Doctors from "./pages/doctors/Doctors";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<HomePage />} /> // Home route
         <Route path="/auth" element={<Auth />} /> // Auth route
         <Route path="/dashboard" element={<Dashboard />} /> // Dashboard route
+        <Route path="/doctors" element={<Doctors />} /> // Doctors route
       </Routes>
       <Footer />
     </>

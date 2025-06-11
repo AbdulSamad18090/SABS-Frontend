@@ -11,6 +11,7 @@ import {
   X,
   User,
   LogOut,
+  ArrowLeftFromLine,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -24,6 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { handleLogout } from "@/lib/utils";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -113,15 +115,6 @@ const Header = () => {
     setIsSheetOpen(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setIsLogined(false);
-    setUserRole(null);
-    setIsSheetOpen(false);
-    // Optionally redirect to home page
-    window.location.href = "/";
-  };
-
   return (
     <>
       {/* Desktop Header - Top */}
@@ -130,25 +123,27 @@ const Header = () => {
           <Activity className="h-8 w-8 text-primary" />
           <span className="ml-2 text-xl font-bold">SmartDoc</span>
         </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-4">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               className="text-sm font-medium hover:text-primary transition-colors"
-              href={item.href}
+              to={item.href}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
 
           <ModeToggle />
           {isLogined ? (
-            <Link to={"/dashboard"}>
-              <Button>
-                <Activity />
-                Dashboard
-              </Button>
-            </Link>
+            <>
+              <Link to={"/dashboard"}>
+                <Button>
+                  <Activity />
+                  Dashboard
+                </Button>
+              </Link>
+            </>
           ) : (
             <Link to={"/auth"}>
               <Button>
@@ -205,15 +200,15 @@ const Header = () => {
                     {navItems.map((item) => {
                       const IconComponent = item.icon;
                       return (
-                        <a
+                        <Link
                           key={item.href}
-                          href={item.href}
+                          to={item.href}
                           onClick={handleLinkClick}
                           className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
                           <IconComponent className="h-5 w-5" />
                           {item.label}
-                        </a>
+                        </Link>
                       );
                     })}
                   </div>
