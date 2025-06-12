@@ -41,8 +41,7 @@ const Doctors = () => {
   // Filter doctors based on search term
   const filteredDoctors = doctors.filter((doctor) => {
     const name = doctor.full_name?.toLowerCase() || "";
-    const specialty =
-      doctor.doctorProfile?.specialization?.toLowerCase() || "";
+    const specialty = doctor.doctorProfile?.specialization?.toLowerCase() || "";
     const location = doctor.doctorProfile?.address?.toLowerCase() || "";
 
     return (
@@ -156,10 +155,10 @@ const Doctors = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        <h3 className="text-lg font-semibold text-foreground truncate">
                           {doctor.full_name}
                         </h3>
-                        <p className="text-blue-600 font-medium">
+                        <p className="text-primary font-medium">
                           {profile.specialization || "Specialty N/A"}
                         </p>
                         <div className="flex items-center mt-1">
@@ -179,7 +178,9 @@ const Doctors = () => {
                       </div>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Clock className="h-4 w-4 mr-2" />
-                        <span>{profile.experience || "N/A"} year(s) experience</span>
+                        <span>
+                          {profile.experience || "N/A"} year(s) experience
+                        </span>
                       </div>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <MapPin className="h-4 w-4 mr-2" />
