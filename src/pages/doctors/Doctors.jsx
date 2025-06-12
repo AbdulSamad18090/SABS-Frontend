@@ -42,7 +42,7 @@ const Doctors = () => {
   const filteredDoctors = doctors.filter((doctor) => {
     const name = doctor.full_name?.toLowerCase() || "";
     const specialty =
-      doctor.doctorProfile?.speciallization?.toLowerCase() || "";
+      doctor.doctorProfile?.specialization?.toLowerCase() || "";
     const location = doctor.doctorProfile?.address?.toLowerCase() || "";
 
     return (
@@ -160,7 +160,7 @@ const Doctors = () => {
                           {doctor.full_name}
                         </h3>
                         <p className="text-blue-600 font-medium">
-                          {profile.speciallization || "Specialty N/A"}
+                          {profile.specialization || "Specialty N/A"}
                         </p>
                         <div className="flex items-center mt-1">
                           <Star className="h-4 w-4 text-yellow-400 fill-current" />
@@ -179,7 +179,7 @@ const Doctors = () => {
                       </div>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Clock className="h-4 w-4 mr-2" />
-                        <span>{profile.experience || "N/A"} experience</span>
+                        <span>{profile.experience || "N/A"} year(s) experience</span>
                       </div>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <MapPin className="h-4 w-4 mr-2" />

@@ -9,7 +9,7 @@ const Dashboard = () => {
     setAuthenticatedUser(LoggedInUser);
   }, []);
 
-  console.log("Authenticated User ==>", authenticatedUser);
+  // console.log("Authenticated User ==>", authenticatedUser);
 
   return (
     <div className="min-h-screen">

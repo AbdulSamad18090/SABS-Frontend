@@ -42,9 +42,12 @@ import {
 import { handleLogout } from "@/lib/utils";
 import { getInitials } from "../../dashboardUtils";
 import DoctorAppointmentCard from "../DoctorAppointmentCard";
+import { Link } from "react-router-dom";
 
 const DoctorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   // Mock data - replace with actual API calls
   const doctorData = {
@@ -171,6 +174,10 @@ const DoctorDashboard = () => {
                       <AvatarFallback>
                         {getInitials(doctorData.full_name)}
                       </AvatarFallback>
+                      <AvatarImage
+                        src={user?.doctorProfile?.profile_image}
+                        alt="pic"
+                      />
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -180,23 +187,31 @@ const DoctorDashboard = () => {
                       <AvatarFallback>
                         {getInitials(doctorData.full_name)}
                       </AvatarFallback>
+                      <AvatarImage
+                        src={user?.doctorProfile?.profile_image}
+                        alt={"pic"}
+                      />
                     </Avatar>
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{doctorData.full_name}</p>
+                      <p className="font-medium">{user?.full_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {doctorData.doctorProfile.specialization}
+                        {user?.doctorProfile?.specialization}
                       </p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
+                  <Link to={"/profile"}>
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to={"/settings"}>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600"
