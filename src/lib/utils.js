@@ -11,3 +11,13 @@ export const handleLogout = async () => {
   await localStorage.removeItem("refreshToken");
   window.location.href = "/";
 };
+
+
+export function formatDateTime(timestamp) {
+  const date = new Date(timestamp);
+
+  const formattedDate = date.toLocaleDateString(); // e.g., 6/13/2025
+  const formattedTime = date.toLocaleTimeString(); // e.g., 11:45:37 AM (depends on locale)
+
+  return `${formattedDate} at ${formattedTime}`;
+}

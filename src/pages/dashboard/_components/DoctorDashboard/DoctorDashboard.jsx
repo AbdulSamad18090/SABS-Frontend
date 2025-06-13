@@ -49,21 +49,6 @@ const DoctorDashboard = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Mock data - replace with actual API calls
-  const doctorData = {
-    id: "fd4f2074-3d9d-4dcf-a049-99ba063ac64f",
-    full_name: "Dr. Abdul Samad",
-    email: "abdulsamad18090@gmail.com",
-    role: "doctor",
-    doctorProfile: {
-      profile_image: null,
-      bio: "Experienced cardiologist with 10+ years of practice",
-      specialization: "Cardiology",
-      phone: "+92 300 1234567",
-      clinic_address: "Heart Care Clinic, Shekhupura, Punjab",
-    },
-  };
-
   const todayAppointments = [
     {
       id: 1,
@@ -172,7 +157,7 @@ const DoctorDashboard = () => {
                   <Button variant="ghost" className="relative">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>
-                        {getInitials(doctorData.full_name)}
+                        {getInitials(user?.full_name)}
                       </AvatarFallback>
                       <AvatarImage
                         src={user?.doctorProfile?.profile_image}
@@ -185,7 +170,7 @@ const DoctorDashboard = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>
-                        {getInitials(doctorData.full_name)}
+                        {getInitials(user?.full_name)}
                       </AvatarFallback>
                       <AvatarImage
                         src={user?.doctorProfile?.profile_image}

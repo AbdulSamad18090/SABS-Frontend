@@ -14,20 +14,25 @@ import { fetchDoctors } from "@/redux/slices/doctorSlice";
 import Loader from "@/components/loader/Loader";
 import DoctorCard from "./_components/DoctorCard";
 
-const DOCTORS_PER_PAGE = 6;
+const DOCTORS_PER_PAGE = 12;
 
 const Doctors = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const { doctors, loading } = useSelector((state) => state.doctor);
+  const [currentPage, setCurrentPage] = useState(1);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchDoctors({ page: 1, limit: 50 }));
-  }, [dispatch]);
+  const { doctors, loading, total } = useSelector((state) => state.doctor);
 
-  // Filter doctors based on search term
+  useEffect(() => {
+    dispatch(fetchDoctors({ page: currentPage, limit: DOCTORS_PER_PAGE }));
+  }, [dispatch, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Client-side search filtering (from fetched page)
   const filteredDoctors = doctors.filter((doctor) => {
     const name = doctor.full_name?.toLowerCase() || "";
     const specialty = doctor.doctorProfile?.specialization?.toLowerCase() || "";
@@ -40,16 +45,7 @@ const Doctors = () => {
     );
   });
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredDoctors.length / DOCTORS_PER_PAGE);
-  const startIndex = (currentPage - 1) * DOCTORS_PER_PAGE;
-  const endIndex = startIndex + DOCTORS_PER_PAGE;
-  const currentDoctors = filteredDoctors.slice(startIndex, endIndex);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const totalPages = Math.ceil(total / DOCTORS_PER_PAGE);
 
   if (loading) {
     return (
@@ -94,16 +90,15 @@ const Doctors = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
           <p className="text-muted-foreground">
-            Showing {startIndex + 1}-
-            {Math.min(endIndex, filteredDoctors.length)} of{" "}
-            {filteredDoctors.length} doctors
+            Showing {filteredDoctors.length} doctors on page {currentPage} of{" "}
+            {totalPages}
           </p>
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Doctor Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        {currentDoctors.length === 0 ? (
+        {filteredDoctors.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">
               No doctors found matching your search.
@@ -111,17 +106,17 @@ const Doctors = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentDoctors.map((doctor) => {
-              const profile = doctor.doctorProfile || {};
-              const rating = doctor.averageRating ?? "N/A";
-              const reviews = doctor.totalReviews || 0;
+            {filteredDoctors.map((doctor) => {
+              const profile = doctor?.doctorProfile || {};
+              const averageRating = doctor?.averageRating ?? "N/A";
+              const totalReviews = doctor.totalReviews || 0;
               return (
                 <DoctorCard
-                  key={doctor?.id}
+                  key={doctor.id}
                   doctor={doctor}
                   profile={profile}
-                  rating={rating}
-                  reviews={reviews}
+                  avgRating={averageRating}
+                  totalreviews={totalReviews}
                 />
               );
             })}
@@ -129,58 +124,60 @@ const Doctors = () => {
         )}
 
         {/* Pagination */}
-        <div className="mt-12 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage > 1) handlePageChange(currentPage - 1);
-                  }}
-                  className={
-                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 1) handlePageChange(currentPage - 1);
+                    }}
+                    className={
+                      currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
+                </PaginationItem>
 
-              {[...Array(totalPages)].map((_, index) => {
-                const page = index + 1;
-                return (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handlePageChange(page);
-                      }}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
+                {[...Array(totalPages)].map((_, index) => {
+                  const page = index + 1;
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageChange(page);
+                        }}
+                        isActive={currentPage === page}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
 
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage < totalPages)
-                      handlePageChange(currentPage + 1);
-                  }}
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages)
+                        handlePageChange(currentPage + 1);
+                    }}
+                    className={
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );
