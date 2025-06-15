@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,8 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
+  const reviewsRef = useRef(null);
+  const [scrollToReviews, setScrollToReviews] = useState(false);
 
   const fetchReviews = async () => {
     try {
@@ -93,6 +95,18 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
       console.log("Reviews ==>", reviews);
     }
   }, [isOpen, doctor?.id]);
+
+  useEffect(() => {
+    if (isOpen && scrollToReviews) {
+      // Delay to allow Dialog content to mount
+      const timeout = setTimeout(() => {
+        reviewsRef.current?.scrollIntoView({ behavior: "smooth" });
+        setScrollToReviews(false); // reset flag
+      }, 300); // adjust this based on Dialog open animation time
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isOpen, scrollToReviews]);
 
   const formatPhone = (number) => {
     if (!number) return null;
@@ -154,7 +168,13 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
               <p className="text-primary font-medium">
                 {profile.specialization || "Specialty N/A"}
               </p>
-              <div className="flex items-center mt-1">
+              <div
+                className="flex items-center mt-1 cursor-pointer hover:underline"
+                onClick={() => {
+                  setIsOpen(true);
+                  setScrollToReviews(true);
+                }}
+              >
                 <Star className="h-4 w-4 text-yellow-400 fill-current" />
                 <span className="ml-1 text-sm text-muted-foreground">
                   {avgRating} ({totalreviews} reviews)
@@ -227,7 +247,12 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
                   <p className="text-primary font-medium">
                     {profile.specialization + " Specialist" || "Specialty N/A"}
                   </p>
-                  <div className="flex items-center mt-1 hover:underline w-fit cursor-default">
+                  <div
+                    className="flex items-center mt-1 hover:underline w-fit cursor-pointer"
+                    onClick={() =>
+                      reviewsRef.current?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  >
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
                     <span className="ml-1 text-sm text-muted-foreground">
                       {avgRating} ({totalreviews} reviews)
@@ -349,7 +374,7 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
               </CardContent>
             </Card>
             {/* Reviews */}
-            <Card>
+            <Card ref={reviewsRef}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className={"pb-0 mb-0"}>Reviews</CardTitle>
