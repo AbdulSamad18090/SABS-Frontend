@@ -43,6 +43,7 @@ import { handleLogout } from "@/lib/utils";
 import { getInitials } from "../../dashboardUtils";
 import DoctorAppointmentCard from "../DoctorAppointmentCard";
 import { Link } from "react-router-dom";
+import Schedule from "./_components/Schedule";
 
 const DoctorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -423,25 +424,7 @@ const DoctorDashboard = () => {
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Schedule Management</CardTitle>
-                <CardDescription>
-                  Set your availability and working hours
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    Schedule Settings
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Schedule management features will be available here
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <Schedule />
           </TabsContent>
         </Tabs>
       </div>

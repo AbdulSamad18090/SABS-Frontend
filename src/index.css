@@ -126,8 +126,28 @@
 }
 
 
-/* CSS style for available slots */
-.fc-event.available-slot {
-  background-color: #c6f6d5 !important; /* green light background */
-  border: none !important;
+/* Tailwind-enhanced FullCalendar buttons */
+
+.fc .fc-button {
+  @apply bg-primary text-white font-medium px-4 py-1.5 rounded-md shadow-sm transition duration-150 ease-in-out;
+}
+
+.fc .fc-button:hover {
+  @apply bg-primary/90;
+}
+
+.fc .fc-button:focus {
+  @apply ring-2 ring-primary/50 outline-none;
+}
+
+.fc .fc-button:active {
+  @apply bg-primary/80 scale-[0.97];
+}
+
+.fc .fc-button.fc-button-active {
+  @apply bg-primary text-white border border-primary;
+}
+
+.fc .fc-button:disabled {
+  @apply bg-gray-300 text-gray-500 opacity-50 cursor-not-allowed;
 }
