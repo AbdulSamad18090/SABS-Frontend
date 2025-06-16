@@ -124,3 +124,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* CSS style for available slots */
+.fc-event.available-slot {
+  background-color: #c6f6d5 !important; /* green light background */
+  border: none !important;
+}

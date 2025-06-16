@@ -34,6 +34,7 @@ import axiosInstance from "../../../../axiosInstance";
 import { getInitials } from "@/pages/dashboard/dashboardUtils";
 import { formatDateTime } from "@/lib/utils";
 import { toast } from "sonner";
+import BookAppointmentDrawer from "./BookAppointmentDrawer";
 
 const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +47,8 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const reviewsRef = useRef(null);
   const [scrollToReviews, setScrollToReviews] = useState(false);
+  const [isOpenBookAppointmentDrawer, setIsOpenBookAppointmentDrawer] =
+    useState(false);
 
   const fetchReviews = async () => {
     try {
@@ -509,12 +512,16 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
                 Close
               </Button>
             </DialogClose>
-            <Button>
+            <Button onClick={() => setIsOpenBookAppointmentDrawer(true)}>
               <CalendarCheck /> Book Appointment
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <BookAppointmentDrawer
+        isOpen={isOpenBookAppointmentDrawer}
+        onClose={() => setIsOpenBookAppointmentDrawer(false)}
+      />
     </>
   );
 };
