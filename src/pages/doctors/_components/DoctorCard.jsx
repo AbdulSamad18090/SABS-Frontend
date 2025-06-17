@@ -521,6 +521,7 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
       <BookAppointmentDrawer
         isOpen={isOpenBookAppointmentDrawer}
         onClose={() => setIsOpenBookAppointmentDrawer(false)}
+        doctorId={doctor?.id}
       />
     </>
   );

@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-*{
+* {
   scroll-behavior: smooth;
 }
 
@@ -114,8 +114,6 @@
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -125,11 +123,9 @@
   }
 }
 
-
-/* Tailwind-enhanced FullCalendar buttons */
-
+/* FullCalendar button styling */
 .fc .fc-button {
-  @apply bg-primary text-white font-medium px-4 py-1.5 rounded-md shadow-sm transition duration-150 ease-in-out;
+  @apply bg-primary text-white font-medium px-4 py-1.5 rounded-md shadow-sm transition duration-150 ease-in-out border-none outline-none;
 }
 
 .fc .fc-button:hover {
@@ -137,17 +133,17 @@
 }
 
 .fc .fc-button:focus {
-  @apply ring-2 ring-primary/50 outline-none;
+  @apply outline-none ring-0;
 }
 
 .fc .fc-button:active {
-  @apply bg-primary/80 scale-[0.97];
+  @apply bg-primary scale-[0.97] outline-none ring-0;
 }
 
 .fc .fc-button.fc-button-active {
-  @apply bg-primary text-white border border-primary;
+  @apply bg-primary text-white;
 }
 
 .fc .fc-button:disabled {
-  @apply bg-gray-300 text-gray-500 opacity-50 cursor-not-allowed;
+  @apply bg-muted text-muted-foreground opacity-50 cursor-not-allowed;
 }
