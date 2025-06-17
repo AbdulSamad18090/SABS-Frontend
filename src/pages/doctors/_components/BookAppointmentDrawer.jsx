@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import axiosInstance from "../../../../axiosInstance";
+// import axiosInstance from "../../../../axiosInstance";
 
 import {
   Drawer,
@@ -16,23 +16,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const BookAppointmentDrawer = ({ isOpen, onClose, doctorId }) => {
+const BookAppointmentDrawer = ({ isOpen, onClose, doctorId, availableSlots}) => {
   const [workingSlots, setWorkingSlots] = useState([]);
 
-  console.log("Working Slots ==>", workingSlots);
-
   useEffect(() => {
-    const fetchExistingSlots = async () => {
+    const prepareAvailableSlots = async () => {
       try {
-        if (!doctorId) return;
-        const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/api/slots/get-schedule/${doctorId}`
-        );
+        // if (!doctorId) return;
+        // const response = await axiosInstance.get(
+        //   `${import.meta.env.VITE_BASE_URL}/api/slots/get-schedule/${doctorId}`
+        // );
 
-        const slots = response?.data?.schedule || [];
-        console.log("Slots=====>", slots);
+        // const slots = response?.data?.schedule || [];
 
-        const mappedSlots = slots.map((slot) => {
+        const mappedSlots = availableSlots.map((slot) => {
           const date = new Date(slot.slot_date); // already has full ISO timestamp
 
           const [startHours, startMinutes, startSeconds] = slot.start_time
@@ -69,7 +66,7 @@ const BookAppointmentDrawer = ({ isOpen, onClose, doctorId }) => {
       }
     };
 
-    fetchExistingSlots();
+    prepareAvailableSlots();
   }, [doctorId]);
 
   const handleSlotClick = (info) => {

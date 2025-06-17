@@ -119,9 +119,9 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
   const getAvailabilityColor = (availability) => {
     if (availability?.includes("Today"))
       return "bg-green-500/10 text-green-600";
-    if (availability?.includes("Tomorrow"))
+    if (availability?.includes("Upcoming"))
       return "bg-blue-500/10 text-blue-600";
-    return "bg-gray-500/10 text-gray-600";
+    return "bg-rose-500/10 text-rose-600";
   };
 
   const StarRating = ({ rating, onRatingChange, interactive = false }) => {
@@ -202,9 +202,22 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <Badge className={getAvailabilityColor("Available Today")}>
-              Available Today
-            </Badge>
+            {doctor?.isAvailableToday ? (
+              <Badge className={getAvailabilityColor("Available Today")}>
+                Available Today
+              </Badge>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className={getAvailabilityColor("Not Available")}>
+                  Not Available Today
+                </Badge>
+                {doctor?.hasUpcomingSlots && (
+                  <Badge className={getAvailabilityColor("Upcoming")}>
+                    Upcoming slots available
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex space-x-2 pt-2">
             <Button
@@ -522,6 +535,7 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
         isOpen={isOpenBookAppointmentDrawer}
         onClose={() => setIsOpenBookAppointmentDrawer(false)}
         doctorId={doctor?.id}
+        availableSlots={doctor?.slots}
       />
     </>
   );
