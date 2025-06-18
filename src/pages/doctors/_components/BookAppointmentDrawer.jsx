@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-// import axiosInstance from "../../../../axiosInstance";
+import axiosInstance from "../../../../axiosInstance";
 
 import {
   Drawer,
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { LoaderCircle } from "lucide-react";
 
 const BookAppointmentDrawer = ({
   isOpen,
@@ -33,6 +34,7 @@ const BookAppointmentDrawer = ({
     appointment_at: "",
     reason: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const prepareAvailableSlots = async () => {
@@ -101,6 +103,35 @@ const BookAppointmentDrawer = ({
     toast.success(`Selected slot: ${formattedDate} ${formattedTime}`);
   };
 
+  const handleBookAppointment = async (e) => {
+    e.preventDefault();
+    if (!newAppointment.appointment_at) {
+      return toast.error("Please select a slot.");
+    }
+    if (!newAppointment.reason) {
+      return toast.error("Please provide a reason.");
+    }
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_BASE_URL}/api/appointment/book`,
+        newAppointment
+      );
+      if (response?.data?.success) {
+        return toast.success(response?.data?.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.details[0] ||
+          error.response?.data?.message ||
+          "Failed to book appointment. Please try again later."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="min-h-dvh flex flex-col justify-between p-4">
@@ -135,9 +166,10 @@ const BookAppointmentDrawer = ({
         </div>
 
         <DrawerFooter className={"p-0 pt-4 border-t"}>
-          <Label>Reason</Label>
+          <Label htmlFor="reason">Reason</Label>
           <Textarea
-            placeholder="Enter reason for the appointment"
+            id="reason"
+            placeholder="Please write reason for the appointment"
             value={newAppointment?.reason}
             onChange={(e) =>
               setNewAppointment((prev) => ({
@@ -164,19 +196,12 @@ const BookAppointmentDrawer = ({
               </Button>
             </DrawerClose>
             <Button
-              onClick={() => {
-                if (!newAppointment.appointment_at || !newAppointment.reason) {
-                  return toast.error(
-                    "Please select a slot and provide a reason."
-                  );
-                }
-
-                console.log("Booking appointment:", newAppointment);
-                // You can now POST this object to your backend
-                // await axiosInstance.post('/api/appointments', newAppointment)
-              }}
+              disabled={isLoading}
+              className={"w-1/5"}
+              onClick={handleBookAppointment}
             >
-              Submit
+              {isLoading && <LoaderCircle className="animate-spin" />}
+              {isLoading ? "Booking..." : "Book"}
             </Button>
           </div>
         </DrawerFooter>
