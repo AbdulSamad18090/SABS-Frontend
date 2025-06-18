@@ -15,9 +15,24 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
-const BookAppointmentDrawer = ({ isOpen, onClose, doctorId, availableSlots}) => {
+const BookAppointmentDrawer = ({
+  isOpen,
+  onClose,
+  doctorId,
+  availableSlots,
+}) => {
   const [workingSlots, setWorkingSlots] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [newAppointment, setNewAppointment] = useState({
+    patient_id: user?.id,
+    doctor_id: doctorId,
+    slot_id: "",
+    appointment_at: "",
+    reason: "",
+  });
 
   useEffect(() => {
     const prepareAvailableSlots = async () => {
@@ -70,8 +85,20 @@ const BookAppointmentDrawer = ({ isOpen, onClose, doctorId, availableSlots}) => 
   }, [doctorId]);
 
   const handleSlotClick = (info) => {
-    alert(`You clicked slot from ${info.event.start.toLocaleTimeString()}`);
-    // Optionally select this slot
+    const start = info.event.start;
+
+    const formattedDate = `${start.getFullYear()}-${
+      start.getMonth() + 1
+    }-${start.getDate()}`;
+    const formattedTime = start.toTimeString().split(" ")[0]; // HH:MM:SS
+
+    setNewAppointment((prev) => ({
+      ...prev,
+      appointment_at: `${formattedDate} ${formattedTime}`, // e.g. 2025-6-18 14:00:00
+      slot_id: info.event.id, // set slot_id
+    }));
+
+    toast.success(`Selected slot: ${formattedDate} ${formattedTime}`);
   };
 
   return (
@@ -99,14 +126,59 @@ const BookAppointmentDrawer = ({ isOpen, onClose, doctorId, availableSlots}) => 
             dayHeaderClassNames={"bg-muted font-normal"}
             eventBackgroundColor="#155dfc"
             eventBorderColor="#155dfc"
+            eventClassNames={(arg) => {
+              return arg.event.id === newAppointment.slot_id
+                ? ["selected-slot cursor-pointer transition-all"]
+                : ["cursor-pointer active:scale-105"];
+            }}
           />
         </div>
 
-        <DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
+        <DrawerFooter className={"p-0 pt-4 border-t"}>
+          <Label>Reason</Label>
+          <Textarea
+            placeholder="Enter reason for the appointment"
+            value={newAppointment?.reason}
+            onChange={(e) =>
+              setNewAppointment((prev) => ({
+                ...prev,
+                reason: e.target.value,
+              }))
+            }
+          />
+          <div className="flex items-center justify-end gap-4">
+            <DrawerClose>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setNewAppointment({
+                    patient_id: user?.id,
+                    doctor_id: doctorId,
+                    slot_id: "",
+                    appointment_at: "",
+                    reason: "",
+                  })
+                }
+              >
+                Cancel
+              </Button>
+            </DrawerClose>
+            <Button
+              onClick={() => {
+                if (!newAppointment.appointment_at || !newAppointment.reason) {
+                  return toast.error(
+                    "Please select a slot and provide a reason."
+                  );
+                }
+
+                console.log("Booking appointment:", newAppointment);
+                // You can now POST this object to your backend
+                // await axiosInstance.post('/api/appointments', newAppointment)
+              }}
+            >
+              Submit
+            </Button>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

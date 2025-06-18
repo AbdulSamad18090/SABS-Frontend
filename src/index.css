@@ -124,7 +124,8 @@
 }
 
 /* FullCalendar button styling */
-.fc .fc-button {
+.fc .fc-button 
+{
   @apply bg-primary text-white font-medium px-4 py-1.5 rounded-md shadow-sm transition duration-150 ease-in-out border-none outline-none;
 }
 
@@ -146,4 +147,15 @@
 
 .fc .fc-button:disabled {
   @apply bg-muted text-muted-foreground opacity-50 cursor-not-allowed;
+}
+
+
+.selected-slot {
+  border: 2px solid #fa1552 !important;
+  border-radius: 4px;
+}
+
+.selected-slot:active {
+  transform: scale(105%);
+  transition: all;
 }
