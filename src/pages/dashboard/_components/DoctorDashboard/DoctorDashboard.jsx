@@ -1,34 +1,6 @@
-import React, { useState } from "react";
-import {
-  Calendar,
-  Clock,
-  Users,
-  User,
-  Bell,
-  Settings,
-  LogOut,
-  Search,
-  Plus,
-  Filter,
-  Eye,
-  CheckCircle,
-  XCircle,
-  Phone,
-  Mail,
-  MapPin,
-  Activity,
-  MoreHorizontal,
-} from "lucide-react";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { User, Bell, Settings, LogOut, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,92 +13,46 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { handleLogout } from "@/lib/utils";
 import { getInitials } from "../../dashboardUtils";
-import DoctorAppointmentCard from "../DoctorAppointmentCard";
 import { Link } from "react-router-dom";
 import Schedule from "./_components/Schedule";
+import Overview from "./_components/Overview";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDoctorAppointments } from "@/redux/slices/doctorSlice";
+import Appointments from "./_components/Appointments";
 
 const DoctorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [stats, setStats] = useState({
+    today: 0,
+    upcoming: 0,
+    cancelled: 0,
+    completed: 0,
+  });
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const todayAppointments = [
-    {
-      id: 1,
-      patient_name: "Ahmad Ali",
-      time: "09:00 AM",
-      type: "Consultation",
-      status: "confirmed",
-      phone: "+92 301 2345678",
-      duration: "30 min",
-    },
-    {
-      id: 2,
-      patient_name: "Fatima Khan",
-      time: "10:30 AM",
-      type: "Follow-up",
-      status: "confirmed",
-      phone: "+92 302 3456789",
-      duration: "15 min",
-    },
-    {
-      id: 3,
-      patient_name: "Hassan Ahmed",
-      time: "02:00 PM",
-      type: "Check-up",
-      status: "pending",
-      phone: "+92 303 4567890",
-      duration: "45 min",
-    },
-    {
-      id: 4,
-      patient_name: "Ayesha Malik",
-      time: "03:30 PM",
-      type: "Consultation",
-      status: "confirmed",
-      phone: "+92 304 5678901",
-      duration: "30 min",
-    },
-  ];
+  const dispatch = useDispatch();
+  const { todayAppointments, upcomingAppointments } = useSelector(
+    (state) => state.doctor
+  );
 
-  const upcomingAppointments = [
-    {
-      id: 5,
-      patient_name: "Muhammad Usman",
-      date: "2025-06-12",
-      time: "11:00 AM",
-      type: "Consultation",
-      status: "confirmed",
-      duration: "30 min",
-    },
-    {
-      id: 6,
-      patient_name: "Zainab Sheikh",
-      date: "2025-06-13",
-      time: "09:30 AM",
-      type: "Follow-up",
-      status: "pending",
-      duration: "20 min",
-    },
-    {
-      id: 7,
-      patient_name: "Ali Hassan",
-      date: "2025-06-14",
-      time: "02:00 PM",
-      type: "Check-up",
-      status: "confirmed",
-      duration: "45 min",
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchDoctorAppointments(user?.id));
+  }, [dispatch, user?.id]);
 
-  const stats = {
-    todayAppointments: todayAppointments.length,
-    pendingAppointments: [...todayAppointments, ...upcomingAppointments].filter(
-      (apt) => apt.status === "pending"
-    ).length,
-    totalPatients: 156,
-    completedToday: 2,
-  };
+  useEffect(() => {
+    if (!todayAppointments || !upcomingAppointments) return;
+
+    const allAppointments = [...todayAppointments, ...upcomingAppointments];
+
+    setStats({
+      today: todayAppointments.length || 0,
+      upcoming: upcomingAppointments.length || 0,
+      cancelled: allAppointments.filter((app) => app.status === "cancelled")
+        .length,
+      completed: allAppointments.filter((app) => app.status === "completed")
+        .length,
+    });
+  }, [todayAppointments, upcomingAppointments]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -216,211 +142,21 @@ const DoctorDashboard = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="patients">Patients</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Today's Appointments
-                  </CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.todayAppointments}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    +2 from yesterday
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Pending Appointments
-                  </CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.pendingAppointments}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Requires attention
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Patients
-                  </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.totalPatients}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    +12 this month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Completed Today
-                  </CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.completedToday}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Good progress</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Today's Appointments */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Today's Appointments</CardTitle>
-                    <CardDescription>
-                      {new Date().toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </CardDescription>
-                  </div>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Appointment
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {todayAppointments.map((appointment) => (
-                  <DoctorAppointmentCard
-                    key={appointment.id}
-                    appointment={appointment}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Calendar className="h-8 w-8 mx-auto mb-4 text-blue-600" />
-                  <CardTitle className="text-lg mb-2">
-                    Manage Schedule
-                  </CardTitle>
-                  <CardDescription>
-                    View and edit your availability
-                  </CardDescription>
-                </CardContent>
-              </Card>
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Users className="h-8 w-8 mx-auto mb-4 text-green-600" />
-                  <CardTitle className="text-lg mb-2">
-                    Patient Records
-                  </CardTitle>
-                  <CardDescription>
-                    Access patient history and files
-                  </CardDescription>
-                </CardContent>
-              </Card>
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Activity className="h-8 w-8 mx-auto mb-4 text-purple-600" />
-                  <CardTitle className="text-lg mb-2">Reports</CardTitle>
-                  <CardDescription>View analytics and reports</CardDescription>
-                </CardContent>
-              </Card>
-            </div>
+            <Overview stats={stats} todayAppointments={todayAppointments} />
           </TabsContent>
 
           <TabsContent value="appointments" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>All Appointments</CardTitle>
-                    <CardDescription>
-                      Manage your upcoming and past appointments
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Filter className="mr-2 h-4 w-4" />
-                      Filter
-                    </Button>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      New Appointment
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Today</h3>
-                  {todayAppointments.map((appointment) => (
-                    <DoctorAppointmentCard
-                      key={appointment.id}
-                      appointment={appointment}
-                    />
-                  ))}
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Upcoming</h3>
-                  {upcomingAppointments.map((appointment) => (
-                    <DoctorAppointmentCard
-                      key={appointment.id}
-                      appointment={appointment}
-                      showDate={true}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="patients" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Patient Management</CardTitle>
-                <CardDescription>
-                  View and manage your patient records
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    Patient Records
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Patient management features will be available here
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <Appointments
+              todayAppointments={todayAppointments}
+              upcomingAppointments={upcomingAppointments}
+            />
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">

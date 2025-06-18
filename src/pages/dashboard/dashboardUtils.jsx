@@ -3,16 +3,16 @@ import { Star } from "lucide-react";
 
 export const getStatusBadge = (status) => {
   switch (status) {
-    case "confirmed":
+    case "completed":
       return (
         <Badge variant="secondary" className="bg-green-500/10 text-green-600">
-          Confirmed
+          Completed
         </Badge>
       );
-    case "pending":
+    case "scheduled":
       return (
         <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">
-          Pending
+          Scheduled
         </Badge>
       );
     case "cancelled":

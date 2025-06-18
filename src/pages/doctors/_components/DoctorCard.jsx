@@ -32,7 +32,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import axiosInstance from "../../../../axiosInstance";
 import { getInitials } from "@/pages/dashboard/dashboardUtils";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import BookAppointmentDrawer from "./BookAppointmentDrawer";
 
@@ -110,11 +110,6 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
       return () => clearTimeout(timeout);
     }
   }, [isOpen, scrollToReviews]);
-
-  const formatPhone = (number) => {
-    if (!number) return null;
-    return number.startsWith("+") ? number : `+92${number.replace(/^0/, "")}`;
-  };
 
   const getAvailabilityColor = (availability) => {
     if (availability?.includes("Today"))

@@ -17,6 +17,19 @@ export const fetchDoctors = createAsyncThunk(
   }
 );
 
+export const fetchDoctorAppointments = createAsyncThunk(
+  "doctors/fetchDoctorAppointments",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/api/appointment/doctor/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+      return rejectWithValue(error.response?.data?.message || "Fetch failed");
+    }
+  }
+);
+
 // Slice
 const doctorSlice = createSlice({
   name: "doctors",
@@ -25,11 +38,14 @@ const doctorSlice = createSlice({
     total: 0,
     page: 1,
     totalPages: 0,
+    todayAppointments: [],
+    upcomingAppointments: [],
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
+    // fetchDoctors
     builder
       .addCase(fetchDoctors.pending, (state) => {
         state.loading = true;
@@ -45,6 +61,22 @@ const doctorSlice = createSlice({
       .addCase(fetchDoctors.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch doctors";
+      });
+    // fetchDoctorAppointments
+    builder
+      .addCase(fetchDoctorAppointments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDoctorAppointments.fulfilled, (state, action) => {
+        state.todayAppointments =
+          action.payload?.appointments?.todayAppointments;
+        state.upcomingAppointments =
+          action.payload?.appointments?.upcomingAppointments;
+      })
+      .addCase(fetchDoctorAppointments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch appointments";
       });
   },
 });

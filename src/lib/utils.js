@@ -12,7 +12,6 @@ export const handleLogout = async () => {
   window.location.href = "/";
 };
 
-
 export function formatDateTime(timestamp) {
   const date = new Date(timestamp);
 
@@ -21,3 +20,23 @@ export function formatDateTime(timestamp) {
 
   return `${formattedDate} at ${formattedTime}`;
 }
+
+export const formateDate = (timestamp) => {
+  const dateObj = new Date(timestamp);
+
+  const optionsDate = { day: "2-digit", month: "long", year: "numeric" };
+  const formattedDate = dateObj.toLocaleDateString("en-US", optionsDate);
+
+  const optionsTime = { hour: "2-digit", minute: "2-digit", hour12: true };
+  const formattedTime = dateObj.toLocaleTimeString("en-US", optionsTime);
+
+  return {
+    date: formattedDate, // e.g., "18 June, 2025"
+    time: formattedTime, // e.g., "04:30 PM"
+  };
+};
+
+export const formatPhone = (number) => {
+  if (!number) return null;
+  return number.startsWith("+") ? number : `+92${number.replace(/^0/, "")}`;
+};
