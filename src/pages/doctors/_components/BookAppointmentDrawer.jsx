@@ -84,7 +84,7 @@ const BookAppointmentDrawer = ({
     };
 
     prepareAvailableSlots();
-  }, [doctorId]);
+  }, [doctorId, availableSlots]);
 
   const handleSlotClick = (info) => {
     const start = info.event.start;
@@ -118,7 +118,23 @@ const BookAppointmentDrawer = ({
         newAppointment
       );
       if (response?.data?.success) {
-        return toast.success(response?.data?.message);
+        // Remove the booked slot from the calendar
+        setWorkingSlots((prevSlots) =>
+          prevSlots.filter((slot) => slot.id !== newAppointment.slot_id)
+        );
+
+        // Reset the appointment form
+        setNewAppointment({
+          patient_id: user?.id,
+          doctor_id: doctorId,
+          slot_id: "",
+          appointment_at: "",
+          reason: "",
+        });
+
+        toast.success(response?.data?.message);
+
+        onClose();
       }
     } catch (error) {
       console.log(error);
