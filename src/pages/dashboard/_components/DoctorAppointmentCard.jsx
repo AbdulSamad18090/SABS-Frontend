@@ -21,8 +21,38 @@ import {
 import { Button } from "@/components/ui/button";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { formateDate, formatPhone } from "@/lib/utils";
+import { toast } from "sonner";
+import axiosInstance from "../../../../axiosInstance";
 
 const DoctorAppointmentCard = ({ appointment }) => {
+  const handleCancel = async (appointmentId) => {
+    try {
+      if (!appointmentId) return;
+
+      const toastId = toast.loading("Cancelling appointment...");
+
+      const response = await axiosInstance.put(
+        `/api/appointment/cancel/${appointmentId}`
+      );
+
+      if (response.status === 200) {
+        toast.dismiss(toastId);
+        toast.success(
+          response?.data?.message || "Appointment cancelled successfully"
+        );
+      } else {
+        toast.dismiss(toastId);
+        toast.error("Unexpected response from server.");
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error(
+        error.response?.data?.message || "Failed to cancel appointment"
+      );
+      console.error("❌ Cancel error:", error);
+    }
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
@@ -85,7 +115,12 @@ const DoctorAppointmentCard = ({ appointment }) => {
                   <CircleCheck className="mr-2 h-4 w-4" />
                   Mark as Complete
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => {
+                    handleCancel(appointment.id);
+                  }}
+                >
                   <XCircle className="mr-2 h-4 w-4" />
                   Cancel Appointment
                 </DropdownMenuItem>
