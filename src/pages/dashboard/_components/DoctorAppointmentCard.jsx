@@ -23,8 +23,11 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import { formateDate, formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import axiosInstance from "../../../../axiosInstance";
+import { useDispatch } from "react-redux";
+import { updateAppointmentStatus } from "@/redux/slices/doctorSlice";
 
 const DoctorAppointmentCard = ({ appointment }) => {
+  const dispatch = useDispatch();
   const handleCancel = async (appointmentId) => {
     try {
       if (!appointmentId) return;
@@ -40,6 +43,7 @@ const DoctorAppointmentCard = ({ appointment }) => {
         toast.success(
           response?.data?.message || "Appointment cancelled successfully"
         );
+        dispatch(updateAppointmentStatus(response?.data?.appointment));
       } else {
         toast.dismiss(toastId);
         toast.error("Unexpected response from server.");
@@ -67,6 +71,7 @@ const DoctorAppointmentCard = ({ appointment }) => {
         toast.success(
           response?.data?.message || "Appointment marked as completed"
         );
+        dispatch(updateAppointmentStatus(response?.data?.appointment));
       } else {
         toast.dismiss(toastId);
         toast.error("Unexpected response from server.");

@@ -53,6 +53,21 @@ const doctorSlice = createSlice({
         state.upcomingAppointments.push(newAppointment);
       }
     },
+    updateAppointmentStatus: (state, action) => {
+      const today = new Date().toISOString().split("T")[0];
+      const { id, status, appointment_at } = action.payload;
+      if (appointment_at.startsWith(today)) {
+        // Update today's appointment
+        state.todayAppointments = state.todayAppointments.map((appt) =>
+          appt.id === id ? { ...appt, status } : appt
+        );
+      } else {
+        // Update upcoming appointment
+        state.upcomingAppointments = state.upcomingAppointments.map((appt) =>
+          appt.id === id ? { ...appt, status } : appt
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     // fetchDoctors
@@ -92,4 +107,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
-export const { addNewAppointment } = doctorSlice.actions;
+export const { addNewAppointment, updateAppointmentStatus } = doctorSlice.actions;
