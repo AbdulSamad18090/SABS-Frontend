@@ -49,10 +49,36 @@ const DoctorAppointmentCard = ({ appointment }) => {
       toast.error(
         error.response?.data?.message || "Failed to cancel appointment"
       );
-      console.error("❌ Cancel error:", error);
     }
   };
 
+  const handleMarkAsCompleted = async (appointmentId) => {
+    try {
+      if (!appointmentId) return;
+
+      const toastId = toast.loading("Marking appointment as completed...");
+
+      const response = await axiosInstance.put(
+        `/api/appointment/complete/${appointmentId}`
+      );
+
+      if (response.status === 200) {
+        toast.dismiss(toastId);
+        toast.success(
+          response?.data?.message || "Appointment marked as completed"
+        );
+      } else {
+        toast.dismiss(toastId);
+        toast.error("Unexpected response from server.");
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to mark appointment as completed"
+      );
+    }
+  };
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
@@ -110,20 +136,28 @@ const DoctorAppointmentCard = ({ appointment }) => {
                     Call Patient
                   </DropdownMenuItem>
                 </a>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <CircleCheck className="mr-2 h-4 w-4" />
-                  Mark as Complete
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-red-600"
-                  onClick={() => {
-                    handleCancel(appointment.id);
-                  }}
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Appointment
-                </DropdownMenuItem>
+                {appointment?.status === "scheduled" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        handleMarkAsCompleted(appointment.id);
+                      }}
+                    >
+                      <CircleCheck className="mr-2 h-4 w-4" />
+                      Mark as Complete
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => {
+                        handleCancel(appointment.id);
+                      }}
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Cancel Appointment
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
