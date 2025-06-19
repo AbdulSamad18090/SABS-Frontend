@@ -43,7 +43,17 @@ const doctorSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    addNewAppointment: (state, action) => {
+      const today = new Date().toISOString().split("T")[0];
+      const newAppointment = action.payload;
+      if (newAppointment.appointment_at.startsWith(today)) {
+        state.todayAppointments.push(newAppointment);
+      } else {
+        state.upcomingAppointments.push(newAppointment);
+      }
+    },
+  },
   extraReducers: (builder) => {
     // fetchDoctors
     builder
@@ -82,3 +92,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
+export const { addNewAppointment } = doctorSlice.actions;

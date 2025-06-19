@@ -2,9 +2,12 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import { socket } from "../socket";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { addNewAppointment } from "@/redux/slices/doctorSlice";
 
 export const useAppointmentSocket = () => {
   const audioRef = useRef(null);
+  const dispatch = useDispatch();
 
   // Memoize user data to avoid re-parsing on every render
   const user = useMemo(() => {
@@ -88,6 +91,7 @@ export const useAppointmentSocket = () => {
           toast.info(
             `New appointment from ${data.patient.full_name} on ${date} at ${time}`
           );
+          dispatch(addNewAppointment(data));
         }
       } catch (error) {
         console.error("Error handling new appointment:", error);
