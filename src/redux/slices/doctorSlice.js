@@ -30,6 +30,21 @@ export const fetchDoctorAppointments = createAsyncThunk(
   }
 );
 
+export const fetchPatientAppointments = createAsyncThunk(
+  "doctors/fetchPatientAppointments",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/appointment/patient/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch patients:", error);
+      return rejectWithValue(error.response?.data?.message || "Fetch failed");
+    }
+  }
+);
+
 // Slice
 const doctorSlice = createSlice({
   name: "doctors",
@@ -103,8 +118,25 @@ const doctorSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to fetch appointments";
       });
+    // fetchPatientAppointments
+    builder
+      .addCase(fetchPatientAppointments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPatientAppointments.fulfilled, (state, action) => {
+        state.todayAppointments =
+          action.payload?.appointments?.todayAppointments;
+        state.upcomingAppointments =
+          action.payload?.appointments?.upcomingAppointments;
+      })
+      .addCase(fetchPatientAppointments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch appointments";
+      });
   },
 });
 
 export default doctorSlice.reducer;
-export const { addNewAppointment, updateAppointmentStatus } = doctorSlice.actions;
+export const { addNewAppointment, updateAppointmentStatus } =
+  doctorSlice.actions;
