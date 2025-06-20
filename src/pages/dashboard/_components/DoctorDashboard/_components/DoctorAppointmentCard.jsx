@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { getInitials, getStatusBadge } from "../../../dashboardUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -7,6 +7,7 @@ import {
   Clock,
   Eye,
   Mail,
+  MessageCircleMore,
   MoreHorizontal,
   Phone,
   XCircle,
@@ -25,8 +26,10 @@ import { toast } from "sonner";
 import axiosInstance from "../../../../../../axiosInstance";
 import { useDispatch } from "react-redux";
 import { updateAppointmentStatus } from "@/redux/slices/doctorSlice";
+import ChatDialog from "../../ChatDialog";
 
 const DoctorAppointmentCard = ({ appointment }) => {
+  const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
   const dispatch = useDispatch();
   const handleCancel = async (appointmentId) => {
     try {
@@ -165,9 +168,21 @@ const DoctorAppointmentCard = ({ appointment }) => {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button
+              size={"icon"}
+              variant={"ghost"}
+              onClick={() => setIsChatDialogOpen(true)}
+            >
+              <MessageCircleMore />
+            </Button>
           </div>
         </div>
       </CardContent>
+      <ChatDialog
+        isOpen={isChatDialogOpen}
+        onClose={() => setIsChatDialogOpen(false)}
+        appointment={appointment}
+      />
     </Card>
   );
 };
