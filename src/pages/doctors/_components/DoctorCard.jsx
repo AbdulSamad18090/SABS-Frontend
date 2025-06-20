@@ -530,7 +530,7 @@ const DoctorCard = ({ doctor, profile, avgRating, totalreviews }) => {
         isOpen={isOpenBookAppointmentDrawer}
         onClose={() => setIsOpenBookAppointmentDrawer(false)}
         doctorId={doctor?.id}
-        availableSlots={doctor?.slots}
+        availableSlots={doctor?.slots?.filter((slot) => !slot.is_booked) || []}
       />
     </>
   );

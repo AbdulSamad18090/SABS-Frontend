@@ -20,6 +20,8 @@ const Schedule = () => {
   const [currentView, setCurrentView] = useState("timeGridWeek");
   const [workingSlots, setWorkingSlots] = useState([]);
 
+  console.log(workingSlots);
+
   useEffect(() => {
     const fetchExistingSlots = async () => {
       try {
@@ -54,6 +56,7 @@ const Schedule = () => {
             title: slot.title,
             start,
             end,
+            is_booked: slot.is_booked,
           };
         });
 
@@ -72,7 +75,7 @@ const Schedule = () => {
 
   // Toggle slot: if exists, remove; else add
   const handleSlotSelect = (selectInfo) => {
-    const { start, end } = selectInfo;
+    const { start, end, is_booked } = selectInfo;
 
     const isAlreadyPresent = workingSlots.some(
       (slot) =>
@@ -98,6 +101,7 @@ const Schedule = () => {
           title: "Available Slot",
           start,
           end,
+          is_booked,
         },
       ]);
     }
@@ -151,6 +155,7 @@ const Schedule = () => {
         start_time: formatTime(startDate),
         end_time: formatTime(endDate),
         slot_date: formatDate(startDate),
+        is_booked: slot.is_booked || false,
       };
     });
 
@@ -163,6 +168,7 @@ const Schedule = () => {
         toast.success(response?.data?.message);
       }
     } catch (error) {
+      console.log(error)
       toast.error(
         error.response?.data?.message ||
           error.response?.data?.details[0] ||

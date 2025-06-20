@@ -36,6 +36,8 @@ const BookAppointmentDrawer = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("Available Slots:", availableSlots?.filter((slot) => slot.is_booked === true));
+
   useEffect(() => {
     const prepareAvailableSlots = async () => {
       try {
