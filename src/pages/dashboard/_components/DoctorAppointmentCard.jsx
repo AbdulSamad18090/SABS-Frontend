@@ -124,7 +124,7 @@ const DoctorAppointmentCard = ({ appointment }) => {
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="left" align="start">
+              <DropdownMenuContent side="bottom" align="end">
                 <a href={`mailto:${appointment?.patient?.email}`}>
                   <DropdownMenuItem>
                     <Mail className="mr-2 h-4 w-4" />
