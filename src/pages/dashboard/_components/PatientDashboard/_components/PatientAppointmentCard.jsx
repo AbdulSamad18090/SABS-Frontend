@@ -1,13 +1,15 @@
 import React from "react";
-import { getInitials, getStatusBadge } from "../dashboardUtils";
+import { getInitials, getStatusBadge } from "../../../dashboardUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Calendar,
   Clock,
+  Dot,
   Eye,
   Mail,
   MapPin,
+  MessageCircleMore,
   MoreHorizontal,
   Phone,
   Star,
@@ -25,7 +27,7 @@ import { formateDate, formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import { updateAppointmentStatus } from "@/redux/slices/doctorSlice";
 import { useDispatch } from "react-redux";
-import axiosInstance from "../../../../axiosInstance";
+import axiosInstance from "../../../../../../axiosInstance";
 
 const PatientAppointmentCard = ({ appointment, showActions = true }) => {
   const dispatch = useDispatch();
@@ -125,6 +127,13 @@ const PatientAppointmentCard = ({ appointment, showActions = true }) => {
                       Call Doctor
                     </DropdownMenuItem>
                   </a>
+                  <DropdownMenuItem className={"items-center"}>
+                    <MessageCircleMore className="mr-2 h-4 w-4" />
+                    Live Consultation
+                    <div className="flex items-center justify-center mr-2 h-3 w-3 animate-ping bg-green-500/20 rounded-full">
+                      <div className="h-1 w-1 rounded-full bg-green-700 dark:bg-green-500 animate-pulse" />
+                    </div>
+                  </DropdownMenuItem>
                   {appointment.status !== "completed" && (
                     <>
                       <DropdownMenuSeparator />

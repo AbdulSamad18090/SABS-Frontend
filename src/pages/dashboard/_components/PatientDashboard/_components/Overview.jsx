@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Plus,
-  Users,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Plus, Users } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,7 +8,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import PatientAppointmentCard from "../../PatientAppointmentCard";
+import PatientAppointmentCard from "./PatientAppointmentCard";
+import { Link } from "react-router-dom";
 
 const Overview = ({ stats, upcomingAppointments }) => {
   return (
@@ -85,10 +80,12 @@ const Overview = ({ stats, upcomingAppointments }) => {
                 Your scheduled medical appointments
               </CardDescription>
             </div>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Book Appointment
-            </Button>
+            <Link to={"/doctors"}>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Book Appointment
+              </Button>
+            </Link>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

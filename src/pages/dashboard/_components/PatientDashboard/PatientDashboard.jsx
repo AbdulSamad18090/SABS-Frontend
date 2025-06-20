@@ -46,7 +46,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { handleLogout } from "@/lib/utils";
 import { getInitials } from "../../dashboardUtils";
-import PatientAppointmentCard from "../PatientAppointmentCard";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPatientAppointments } from "@/redux/slices/doctorSlice";

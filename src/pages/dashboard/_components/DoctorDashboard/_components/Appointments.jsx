@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, Plus } from "lucide-react";
-import DoctorAppointmentCard from "../../DoctorAppointmentCard";
+import DoctorAppointmentCard from "./DoctorAppointmentCard";
+import { Link } from "react-router-dom";
 
 const Appointments = ({ todayAppointments, upcomingAppointments }) => {
   return (
@@ -28,10 +29,12 @@ const Appointments = ({ todayAppointments, upcomingAppointments }) => {
               <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Appointment
-            </Button>
+            <Link to={"/doctors"}>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Book Appointment
+              </Button>
+            </Link>
           </div>
         </div>
       </CardHeader>

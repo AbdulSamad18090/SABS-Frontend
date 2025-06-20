@@ -1,5 +1,5 @@
 import React from "react";
-import { getInitials, getStatusBadge } from "../dashboardUtils";
+import { getInitials, getStatusBadge } from "../../../dashboardUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { formateDate, formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
-import axiosInstance from "../../../../axiosInstance";
+import axiosInstance from "../../../../../../axiosInstance";
 import { useDispatch } from "react-redux";
 import { updateAppointmentStatus } from "@/redux/slices/doctorSlice";
 

@@ -15,7 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DoctorAppointmentCard from "../../DoctorAppointmentCard";
+import DoctorAppointmentCard from "./DoctorAppointmentCard";
 
 const Overview = ({ stats, todayAppointments }) => {
   return (

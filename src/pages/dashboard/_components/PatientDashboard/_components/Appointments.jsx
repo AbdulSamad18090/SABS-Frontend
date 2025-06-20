@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, Plus } from "lucide-react";
-import PatientAppointmentCard from "../../PatientAppointmentCard";
+import PatientAppointmentCard from "./PatientAppointmentCard";
 
 const Appointments = ({ todayAppointments, upcomingAppointments }) => {
   return (
