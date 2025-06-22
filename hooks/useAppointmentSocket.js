@@ -4,6 +4,7 @@ import { socket } from "../socket";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { addNewAppointment } from "@/redux/slices/doctorSlice";
+import { addMessage } from "@/redux/slices/chatSlice";
 
 export const useAppointmentSocket = () => {
   const audioRef = useRef(null);
@@ -115,6 +116,7 @@ export const useAppointmentSocket = () => {
           playNotificationSound();
 
           toast.info(`New message from ${data.sender_name}`);
+          dispatch(addMessage(data));
         }
       } catch (error) {
         console.error("Error handling new message:", error);
