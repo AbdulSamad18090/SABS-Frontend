@@ -194,11 +194,8 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                 </div>
 
                 {/* Messages for this date */}
-                {group.messages.map((msg, msgIndex) => {
+                {group.messages.map((msg) => {
                   const isCurrentUser = msg.sender_id === user?.id;
-                  const showAvatar =
-                    msgIndex === 0 ||
-                    group.messages[msgIndex - 1].sender_id !== msg.sender_id;
 
                   return (
                     <div
@@ -226,15 +223,13 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                         }`}
                       >
                         {/* Sender Name - only show for first message or different sender */}
-                        {showAvatar && (
-                          <span
-                            className={`text-xs font-medium text-muted-foreground mb-1 ${
-                              isCurrentUser ? "text-right" : "text-left"
-                            }`}
-                          >
-                            {isCurrentUser ? "You" : msg.sender_name}
-                          </span>
-                        )}
+                        <span
+                          className={`text-xs font-medium text-muted-foreground mb-1 ${
+                            isCurrentUser ? "text-right" : "text-left"
+                          }`}
+                        >
+                          {isCurrentUser ? "You" : msg.sender_name}
+                        </span>
 
                         {/* Message Bubble */}
                         <div
@@ -242,7 +237,7 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                             isCurrentUser
                               ? "bg-primary text-white rounded-tr-none"
                               : "bg-muted border rounded-tl-none"
-                          } ${!showAvatar ? "mt-1" : ""}`}
+                          }`}
                         >
                           <p className="text-sm leading-relaxed break-words">
                             {msg?.message}
@@ -251,15 +246,8 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
 
                         {/* Timestamp - show on hover or for last message in group */}
                         <span
-                          className={`text-xs text-muted-foreground mt-1 opacity-0 group-hover:opacity-100 transition-opacity ${
+                          className={`text-xs text-muted-foreground mt-1 group-hover:opacity-100 transition-opacity ${
                             isCurrentUser ? "text-right" : "text-left"
-                          } ${
-                            msgIndex === group.messages.length - 1 ||
-                            (msgIndex < group.messages.length - 1 &&
-                              group.messages[msgIndex + 1].sender_id !==
-                                msg.sender_id)
-                              ? "opacity-100"
-                              : ""
                           }`}
                         >
                           {getSmartTimeFormat(msg.created_at)}
