@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,18 +6,47 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { getInitials } from "@/pages/dashboard/dashboardUtils";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Paperclip, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import axiosInstance from "../../../../axiosInstance";
+import { toast } from "sonner";
 
 const ChatDialog = ({ isOpen, onClose, appointment }) => {
-  console.log(appointment);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [newMessage, setNewMessage] = useState({
+    sender_id: user?.id,
+    receiver_id: appointment?.doctor?.id || appointment?.patient?.id,
+    appointment_id: appointment?.id,
+    message: "",
+  });
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.message.trim()) {
+      return;
+    }
+    try {
+      const response = await axiosInstance.post(
+        "/api/chat/send-message",
+        newMessage
+      );
+      console.log(response);
+      setNewMessage({ ...newMessage, message: "" });
+    } catch (error) {
+      console.log(error)
+      toast.error(
+        error.response?.data?.message ||
+          error?.data?.details[0] ||
+          "Failed to send message"
+      );
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl">
@@ -55,12 +84,19 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
           {/* Chat content goes here */}
         </div>
         <DialogFooter>
-          <div className="flex w-full items-center gap-2">
+          <form
+            onSubmit={handleSendMessage}
+            className="flex w-full items-center gap-2"
+          >
             <div className="relative flex-1">
               <Input
                 type="text"
                 placeholder="Type your message here..."
                 className="pr-10 pl-3"
+                value={newMessage.message}
+                onChange={(e) =>
+                  setNewMessage({ ...newMessage, message: e.target.value })
+                }
               />
               <label
                 htmlFor="file-upload"
@@ -79,7 +115,7 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
             <Button size="icon" type="submit">
               <Send className="w-5 h-5" />
             </Button>
-          </div>
+          </form>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -100,10 +100,37 @@ export const useAppointmentSocket = () => {
     [user?.id, playNotificationSound, formatDate]
   );
 
+  const handleNewMessage = useCallback(
+    (data) => {
+      console.log("🆕 New message received!", data);
+
+      try {
+        // Validate data structure
+        if (!data || !data.sender_id || !data.receiver_id || !data.message) {
+          console.error("Invalid message data received:", data);
+          return;
+        }
+
+        if (user?.id === data.receiver_id) {
+          playNotificationSound();
+
+          toast.info(`New message from ${data.sender_name}`);
+        }
+      } catch (error) {
+        console.error("Error handling new message:", error);
+      }
+    },
+    [user?.id, playNotificationSound]
+  );
+
   useEffect(() => {
     // Socket connection event handlers
     const handleConnect = () => {
       console.log("Socket connected");
+      if (user?.id) {
+        socket.emit("join", user.id); // Join personal room
+        console.log("Joined room:", user.id);
+      }
     };
 
     const handleDisconnect = (reason) => {
@@ -119,6 +146,7 @@ export const useAppointmentSocket = () => {
     socket.on("disconnect", handleDisconnect);
     socket.on("connect_error", handleConnectError);
     socket.on("new_appointment", handleNewAppointment);
+    socket.on("new_message", handleNewMessage);
 
     return () => {
       // Clean up all event listeners
@@ -126,11 +154,12 @@ export const useAppointmentSocket = () => {
       socket.off("disconnect", handleDisconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("new_appointment", handleNewAppointment);
+      socket.off("new_message", handleNewMessage);
     };
   }, [handleNewAppointment]);
 
   return {
     isConnected: socket.connected,
-    socket, // Return socket instance if needed elsewhere
+    socket,
   };
 };

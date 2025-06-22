@@ -69,6 +69,8 @@ const PatientDashboard = () => {
     (state) => state.doctor
   );
 
+  console.log("Appointments:", todayAppointments, upcomingAppointments);
+
   useEffect(() => {
     dispatch(fetchPatientAppointments(user?.id));
   }, [dispatch, user?.id]);
