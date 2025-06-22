@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getInitials, getStatusBadge } from "../../../dashboardUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,13 +24,27 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import { formateDate, formatPhone } from "@/lib/utils";
 import { toast } from "sonner";
 import axiosInstance from "../../../../../../axiosInstance";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateAppointmentStatus } from "@/redux/slices/doctorSlice";
 import ChatDialog from "../../ChatDialog";
+import { Badge } from "@/components/ui/badge";
+import { setNewMessages } from "@/redux/slices/chatSlice";
 
 const DoctorAppointmentCard = ({ appointment }) => {
   const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const dispatch = useDispatch();
+  const { newMessages } = useSelector((state) => state.chat);
+
+  useEffect(() => {
+    if (appointment?.id) {
+      const filteredMessages = newMessages.filter(
+        (message) => message.appointment_id === appointment.id
+      );
+      setNotificationCount(filteredMessages.length);
+    }
+  }, [appointment?.id, newMessages]);
+
   const handleCancel = async (appointmentId) => {
     try {
       if (!appointmentId) return;
@@ -169,18 +183,44 @@ const DoctorAppointmentCard = ({ appointment }) => {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              size={"icon"}
-              variant={"ghost"}
-              onClick={() => setIsChatDialogOpen(true)}
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                setIsChatDialogOpen(true);
+                setNotificationCount(0);
+                dispatch(
+                  setNewMessages(
+                    newMessages.filter(
+                      (message) => message.appointment_id !== appointment.id
+                    )
+                  )
+                );
+              }}
+              className="relative"
             >
-              <MessageCircleMore />
+              {notificationCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-white shadow">
+                  {notificationCount}
+                </span>
+              )}
+              <MessageCircleMore className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </CardContent>
       <ChatDialog
         isOpen={isChatDialogOpen}
-        onClose={() => setIsChatDialogOpen(false)}
+        onClose={() => {
+          setIsChatDialogOpen(false);
+          setNotificationCount(0);
+          dispatch(
+            setNewMessages(
+              newMessages.filter(
+                (message) => message.appointment_id !== appointment.id
+              )
+            )
+          );
+        }}
         appointment={appointment}
       />
     </Card>

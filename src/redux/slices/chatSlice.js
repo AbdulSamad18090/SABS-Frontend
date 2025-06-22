@@ -21,6 +21,7 @@ export const fetchChatMessages = createAsyncThunk(
 const chatSlice = createSlice({
   name: "chat",
   initialState: {
+    newMessages: [],
     messages: [],
     loading: false,
     error: null,
@@ -28,6 +29,10 @@ const chatSlice = createSlice({
   reducers: {
     addMessage: (state, action) => {
       state.messages.push(action.payload);
+      state.newMessages.push(action.payload);
+    },
+    setNewMessages: (state, action) => {
+      state.newMessages = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -47,6 +52,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { addMessage } = chatSlice.actions;
+export const { addMessage, setNewMessages } = chatSlice.actions;
 
 export default chatSlice.reducer;
