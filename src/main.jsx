@@ -7,13 +7,16 @@ import { ThemeProvider } from "./components/theme-provider/theme-provider";
 import { Toaster } from "./components/ui/sonner";
 import { Provider } from "react-redux";
 import store from "./redux/store/store";
+import { CallProvider } from "../context/CallContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Provider store={store}>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-          <App />
+          <CallProvider>
+            <App />
+          </CallProvider>
         </ThemeProvider>
         <Toaster position="top-center" />
       </Provider>

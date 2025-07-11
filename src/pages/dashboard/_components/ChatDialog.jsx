@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +7,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { getInitials } from "@/pages/dashboard/dashboardUtils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Paperclip,
   Send,
@@ -20,25 +28,21 @@ import {
   VideoOff,
   PhoneOff,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import axiosInstance from "../../../../axiosInstance";
+import { getInitials } from "@/pages/dashboard/dashboardUtils";
 import { toast } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import { addMessage, fetchChatMessages } from "@/redux/slices/chatSlice";
 import Loader from "@/components/loader/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchChatMessages, addMessage } from "@/redux/slices/chatSlice";
 import { getSmartTimeFormat } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { socket } from "../../../../socket.js";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from "@/components/ui/drawer";
+import axiosInstance from "../../../../axiosInstance";
+import { socket } from "../../../../socket";
+import { CallContext } from "../../../../context/CallContext";
 
 const ChatDialog = ({ isOpen, onClose, appointment }) => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const dispatch = useDispatch();
+  const { messages, loading } = useSelector((state) => state.chat);
+
   const [newMessage, setNewMessage] = useState({
     sender_id: user?.id,
     receiver_id: appointment?.doctor?.id || appointment?.patient?.id,
@@ -49,94 +53,13 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
   const messagesEndRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const [peerConnection, setPeerConnection] = useState(null);
+
   const [localStream, setLocalStream] = useState(null);
-  // const socket = useRef(null);
   const [videoDrawerOpen, setVideoDrawerOpen] = useState(false);
   const [muted, setMuted] = useState(false);
   const [videoOff, setVideoOff] = useState(false);
-  const [incomingCall, setIncomingCall] = useState(null); // { from, offer }
-  const [showIncomingPopup, setShowIncomingPopup] = useState(false);
 
-  const dispatch = useDispatch();
-  const { messages, loading } = useSelector((state) => state.chat);
-
-  useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
-
-    socket.emit("join", user?.id);
-
-    socket.on("incoming-call", ({ from, offer }) => {
-      setIncomingCall({ from, offer });
-      setShowIncomingPopup(true);
-    });
-
-    socket.on("call-answered", async ({ answer }) => {
-      if (peerConnection) {
-        await peerConnection.setRemoteDescription(
-          new RTCSessionDescription(answer)
-        );
-      }
-    });
-
-    socket.on("ice-candidate", async ({ candidate }) => {
-      if (peerConnection) {
-        try {
-          await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (err) {
-          console.error("ICE candidate error:", err);
-        }
-      }
-    });
-
-    return () => {
-      socket.off("incoming-call");
-      socket.off("call-answered");
-      socket.off("ice-candidate");
-    };
-  }, []);
-
-  const acceptCall = async () => {
-    setShowIncomingPopup(false);
-    const pc = createPeerConnection(incomingCall.from);
-    setPeerConnection(pc);
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    setLocalStream(stream);
-
-    stream.getTracks().forEach((track) => {
-      pc.addTrack(track, stream);
-    });
-
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = stream;
-    }
-
-    await pc.setRemoteDescription(
-      new RTCSessionDescription(incomingCall.offer)
-    );
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-
-    socket.emit("answer-call", {
-      to: incomingCall.from,
-      answer,
-    });
-
-    setVideoDrawerOpen(true);
-    setIncomingCall(null);
-  };
-
-  const rejectCall = () => {
-    setShowIncomingPopup(false);
-    setIncomingCall(null);
-    // Optionally notify caller
-  };
+  const { peerConnectionRef } = useContext(CallContext);
 
   const createPeerConnection = (otherUserId) => {
     const pc = new RTCPeerConnection({
@@ -163,35 +86,47 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
 
   const startCall = async () => {
     const pc = createPeerConnection(newMessage.receiver_id);
-    setPeerConnection(pc);
+    peerConnectionRef.current = pc;
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
-    setLocalStream(stream);
-    stream.getTracks().forEach((track) => {
-      pc.addTrack(track, stream);
-    });
+      setLocalStream(stream);
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
+      });
 
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = stream;
+      // Open drawer before assigning video
+      setVideoDrawerOpen(true);
+
+      // Let drawer render first
+      setTimeout(() => {
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
+      }, 200);
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      socket.emit("call-user", {
+        to: newMessage.receiver_id,
+        offer,
+      });
+    } catch (err) {
+      console.error("Call start error:", err);
+      toast.error("Failed to access webcam or mic.");
     }
-
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-
-    socket.emit("call-user", {
-      to: newMessage.receiver_id,
-      offer,
-    });
   };
 
   const endCall = () => {
-    if (peerConnection) {
-      peerConnection.close();
-      setPeerConnection(null);
+    const pc = peerConnectionRef.current;
+    if (pc) {
+      pc.close();
+      peerConnectionRef.current = null;
     }
 
     if (localStream) {
@@ -205,17 +140,59 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
     setVideoDrawerOpen(false);
   };
 
+  // Re-assign video stream to video element when available
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  useEffect(() => {
+    if (appointment?.id && isOpen) {
+      dispatch(fetchChatMessages(appointment?.id));
+    }
+  }, [appointment?.id, isOpen, dispatch]);
+
+  useEffect(() => {
+    if (messages.length && isOpen && !loading) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [messages, isOpen, loading]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.message.trim()) return;
+
+    try {
+      const res = await axiosInstance.post(
+        "/api/chat/send-message",
+        newMessage
+      );
+      setNewMessage({ ...newMessage, message: "" });
+      dispatch(addMessage(res.data.data));
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.data?.details?.[0] ||
+          "Failed to send message"
+      );
+    }
+  };
+
   const groupMessagesByDate = (messages) => {
-    const groups = {};
+    const grouped = {};
     messages?.forEach((msg) => {
-      const messageDate = new Date(msg.created_at);
-      const dateKey = messageDate.toDateString();
-      if (!groups[dateKey]) {
-        groups[dateKey] = { date: messageDate, messages: [] };
-      }
-      groups[dateKey].messages.push(msg);
+      const dateKey = new Date(msg.created_at).toDateString();
+      if (!grouped[dateKey]) grouped[dateKey] = [];
+      grouped[dateKey].push(msg);
     });
-    return Object.values(groups).sort((a, b) => a.date - b.date);
+
+    return Object.entries(grouped).map(([date, msgs]) => ({
+      date: new Date(date),
+      messages: msgs,
+    }));
   };
 
   const formatDateHeader = (date) => {
@@ -235,42 +212,6 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
   };
 
   const groupedMessages = groupMessagesByDate(messages);
-
-  useEffect(() => {
-    if (appointment?.id && isOpen) {
-      dispatch(fetchChatMessages(appointment?.id));
-    }
-  }, [appointment?.id, isOpen, dispatch]);
-
-  useEffect(() => {
-    if (messages.length && isOpen && !loading) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, [messages, isOpen, loading]);
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.message.trim()) return;
-    try {
-      const response = await axiosInstance.post(
-        "/api/chat/send-message",
-        newMessage
-      );
-      setNewMessage({ ...newMessage, message: "" });
-      dispatch(addMessage(response.data.data));
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          error?.data?.details?.[0] ||
-          "Failed to send message"
-      );
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -299,21 +240,13 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                   {appointment?.doctor?.full_name ||
                     appointment?.patient?.full_name}
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">
+                <DialogDescription>
                   {appointment?.doctor?.doctorProfile?.specialization ||
                     appointment?.patient?.email}
                 </DialogDescription>
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              className="mr-4"
-              onClick={() => {
-                setVideoDrawerOpen(true);
-                startCall();
-              }}
-            >
+            <Button size="sm" variant="outline" onClick={startCall}>
               <Video className="mr-2 h-4 w-4" />
               Video Call
             </Button>
@@ -406,9 +339,9 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
               />
               <label
                 htmlFor="file-upload"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
               >
-                <Paperclip className="w-4 h-4" />
+                <Paperclip className="w-4 h-4 text-muted-foreground" />
               </label>
               <input
                 id="file-upload"
@@ -424,7 +357,7 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
         </DialogFooter>
 
         <Drawer open={videoDrawerOpen} onOpenChange={setVideoDrawerOpen}>
-          <DrawerContent className="min-h-dvh bg-muted flex flex-col justify-between rounded-t-4xl p-0">
+          <DrawerContent className="min-h-dvh bg-muted flex flex-col justify-between p-0">
             <DrawerHeader className="px-4 pt-4 pb-2 border-b bg-muted">
               <DrawerTitle>In Call</DrawerTitle>
             </DrawerHeader>
@@ -441,7 +374,7 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                 autoPlay
                 muted
                 playsInline
-                className="w-40 h-28 rounded-md p-0 border shadow-lg absolute top-4 right-4 z-10"
+                className="w-40 h-28 rounded-md border shadow-lg absolute top-4 right-4 z-10"
               />
             </div>
 
@@ -450,10 +383,8 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  if (localStream) {
-                    const audioTrack = localStream.getAudioTracks()[0];
-                    audioTrack.enabled = muted;
-                  }
+                  const audioTrack = localStream?.getAudioTracks()[0];
+                  if (audioTrack) audioTrack.enabled = muted;
                   setMuted((prev) => !prev);
                 }}
               >
@@ -468,10 +399,8 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  if (localStream) {
-                    const videoTrack = localStream.getVideoTracks()[0];
-                    videoTrack.enabled = videoOff;
-                  }
+                  const videoTrack = localStream?.getVideoTracks()[0];
+                  if (videoTrack) videoTrack.enabled = videoOff;
                   setVideoOff((prev) => !prev);
                 }}
               >
@@ -491,22 +420,6 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
           </DrawerContent>
         </Drawer>
       </DialogContent>
-      <Dialog open={showIncomingPopup} onOpenChange={setShowIncomingPopup}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Incoming Call</DialogTitle>
-            <DialogDescription>
-              You have an incoming call. Do you want to accept it?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-4 pt-4">
-            <Button variant="secondary" onClick={rejectCall}>
-              Reject
-            </Button>
-            <Button onClick={acceptCall}>Accept</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </Dialog>
   );
 };

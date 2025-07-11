@@ -8,6 +8,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Doctors from "./pages/doctors/Doctors";
 import Profile from "./pages/profile/Profile";
 import { useAppointmentSocket } from "../hooks/useAppointmentSocket";
+import GlobalIncomingCallDialog from "./components/incoming-call-dialog/GlobalIncomingCallDialog";
 
 function App() {
   useAppointmentSocket();
@@ -21,6 +22,7 @@ function App() {
         <Route path="/doctors" element={<Doctors />} /> // Doctors route
         <Route path="/profile" element={<Profile />} /> // Profile route
       </Routes>
+      <GlobalIncomingCallDialog />
       <Footer />
     </>
   );
