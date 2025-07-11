@@ -11,7 +11,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { getInitials } from "@/pages/dashboard/dashboardUtils";
 import { Button } from "@/components/ui/button";
-import { Paperclip, Send } from "lucide-react";
+import { Paperclip, Send, Video } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import axiosInstance from "../../../../axiosInstance";
 import { toast } from "sonner";
@@ -140,33 +140,39 @@ const ChatDialog = ({ isOpen, onClose, appointment }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
-          <div className="flex items-center gap-4">
-            <Avatar className={"h-12 w-12 border shadow-md rounded-lg"}>
-              <AvatarFallback>
-                {getInitials(
-                  appointment?.doctor?.full_name ||
-                    appointment?.patient?.full_name
-                )}
-              </AvatarFallback>
-              <AvatarImage
-                src={
-                  appointment?.doctor?.doctorProfile?.profile_image ||
-                  appointment?.patient?.patientProfile?.profile_image
-                }
-                alt="Profile"
-              />
-            </Avatar>
-            <div className="h-full flex flex-col justify-center">
-              <DialogTitle>
-                {appointment?.doctor?.full_name ? "Dr. " : ""}
-                {appointment?.doctor?.full_name ||
-                  appointment?.patient?.full_name}
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                {appointment?.doctor?.doctorProfile?.specialization ||
-                  appointment?.patient?.email}
-              </DialogDescription>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className={"h-12 w-12 border shadow-md rounded-lg"}>
+                <AvatarFallback>
+                  {getInitials(
+                    appointment?.doctor?.full_name ||
+                      appointment?.patient?.full_name
+                  )}
+                </AvatarFallback>
+                <AvatarImage
+                  src={
+                    appointment?.doctor?.doctorProfile?.profile_image ||
+                    appointment?.patient?.patientProfile?.profile_image
+                  }
+                  alt="Profile"
+                />
+              </Avatar>
+              <div className="h-full flex flex-col justify-center">
+                <DialogTitle>
+                  {appointment?.doctor?.full_name ? "Dr. " : ""}
+                  {appointment?.doctor?.full_name ||
+                    appointment?.patient?.full_name}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">
+                  {appointment?.doctor?.doctorProfile?.specialization ||
+                    appointment?.patient?.email}
+                </DialogDescription>
+              </div>
             </div>
+            <Button size={"sm"} variant={"outline"} className={"mr-4 hover:text-primary"}>
+              <Video />
+              Video Call
+            </Button>
           </div>
         </DialogHeader>
         <div
